@@ -1,0 +1,9 @@
+<ul>
+      <li ng-repeat="item in list.items">
+        ({{item.short_name}}) {{ item.description }}
+        <button ng-click="list.onRemove({index: $index});" class="btn btn-warning">Don't Want this One!</button>
+      </li>
+</ul>
+<div class="error" ng-if="list.errorMessage">
+  <strong style="color: red;">Nothing matches with the given search term!</strong>
+</div>
