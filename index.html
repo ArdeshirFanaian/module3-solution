@@ -5,59 +5,59 @@
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <style media="screen">
-    h1 {
-margin-bottom: 30px;
-}
-input[type="text"] {
-width: 200px;
-float: left;
-}
-.narrow-button {
-float: left;
-margin-left: 10px;
-}
-.loader {
-display: none;
-margin-left: 5px;
-font-size: 10px;
-float: left;
-border-top: 1.1em solid rgba(147, 147, 147, 0.2);
-border-right: 1.1em solid rgba(147, 147, 147, 0.2);
-border-bottom: 1.1em solid rgba(147, 147, 147, 0.2);
-border-left: 1.1em solid #676767;
--webkit-transform: translateZ(0);
--ms-transform: translateZ(0);
-transform: translateZ(0);
--webkit-animation: load8 1.1s infinite linear;
-animation: load8 1.1s infinite linear;
-}
-.loader,
-.loader:after {
-border-radius: 50%;
-width: 3em;
-height: 3em;
-}
-@-webkit-keyframes load8 {
-0% {
-  -webkit-transform: rotate(0deg);
-  transform: rotate(0deg);
-}
-100% {
-  -webkit-transform: rotate(360deg);
-  transform: rotate(360deg);
-}
-}
-@keyframes load8 {
-0% {
-  -webkit-transform: rotate(0deg);
-  transform: rotate(0deg);
-}
-100% {
-  -webkit-transform: rotate(360deg);
-  transform: rotate(360deg);
-}
-}
+    <style>
+      h1 {
+        margin-bottom: 30px;
+      }
+      input[type="text"] {
+        width: 200px;
+        float: left;
+      }
+      .narrow-button {
+        float: left;
+        margin-left: 10px;
+      }
+      .loader {
+        display: none;
+        margin-left: 5px;
+        font-size: 10px;
+        float: left;
+        border-top: 1.1em solid rgba(147, 147, 147, 0.2);
+        border-right: 1.1em solid rgba(147, 147, 147, 0.2);
+        border-bottom: 1.1em solid rgba(147, 147, 147, 0.2);
+        border-left: 1.1em solid #676767;
+        -webkit-transform: translateZ(0);
+        -ms-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-animation: load8 1.1s infinite linear;
+        animation: load8 1.1s infinite linear;
+      }
+      .loader,
+      .loader:after {
+        border-radius: 50%;
+        width: 3em;
+        height: 3em;
+      }
+      @-webkit-keyframes load8 {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes load8 {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
 
     </style>
   </head>
@@ -75,108 +75,97 @@ height: 3em;
 
       <br><br><br>
 
-      <ul>
-            <li ng-repeat="item in list.items">
-              ({{item.short_name}}) {{ item.description }}
-              <button ng-click="list.onRemove({index: $index});" class="btn btn-warning">Don't Want this One!</button>
-            </li>
-      </ul>
-
-      <div class="error" ng-if="list.errorMessage">
-        <strong style="color: red;">Nothing matches with the given search term!</strong>
-      </div>
-
-
       <!-- Bonus loader (see Bonus section of the assignment) -->
       <items-loader-indicator></items-loader-indicator>
 
       <!-- found-items should be implemented as a component -->
       <found-items class="list" items="ctrl.found" on-remove="ctrl.removeItem(index)" error-message="ctrl.errorMessage"></found-items>
   </div>
-<script>
-(function () {
-'use strict';
 
-angular.module('NarrowItDownApp', [])
-.controller('NarrowItDownController', NarrowItDownController)
-.service('MenuSearchService', MenuSearchService)
-.constant('ApiBasePath', "https://davids-restaurant.herokuapp.com")
-.directive('foundItems', FoundItemsDirective);
+  <script type="text/javascript">
+    (function () {
+    'use strict';
 
-function FoundItemsDirective() {
-  var ddo = {
-    templateUrl: 'foundItem.html',
-    scope: {
-      items: '<',
-      onRemove: '&',
-      errorMessage: '<'
-    },
-    controller: NarrowItDownController,
-    controllerAs: 'list',
-    bindToController: true,
-  };
+    angular.module('NarrowItDownApp', [])
+    .controller('NarrowItDownController', NarrowItDownController)
+    .service('MenuSearchService', MenuSearchService)
+    .constant('ApiBasePath', "https://davids-restaurant.herokuapp.com")
+    .directive('foundItems', FoundItemsDirective)
 
-  return ddo;
-}
+    function FoundItemsDirective() {
+      var ddo = {
+        templateUrl: 'foundItem.html',
+        scope: {
+          items: '<',
+          onRemove: '&',
+          errorMessage: '<'
+        },
+        controller: NarrowItDownController,
+        controllerAs: 'list',
+        bindToController: true,
+      };
 
-
-NarrowItDownController.$inject = ['MenuSearchService'];
-function NarrowItDownController(MenuSearchService) {
-  var ctrl = this;
-
-
-  ctrl.searchTerm = '';
-  ctrl.found = [];
-  ctrl.errorMessage = false;
-
-  ctrl.logMenuItems = function () {
-    var promise = MenuSearchService.getMatchedMenuItems(ctrl.searchTerm);
-    promise.then(function (response) {
-      if (response.length !== 0) {
-        ctrl.errorMessage = false;
-      ctrl.found = response;
-    } else {
-      ctrl.errorMessage = true;
+      return ddo;
     }
-    })
-    .catch(function (error) {
-      console.log("Something went terribly wrong.");
-      ctrl.errorMessage = true;
-    })
-  };
-
-  ctrl.removeItem = function (itemIndex) {
-    ctrl.found.splice(itemIndex, 1);
-  };
-};
 
 
-MenuSearchService.$inject = ['$http', 'ApiBasePath', '$filter']
-function MenuSearchService($http, ApiBasePath) {
-  var service = this;
+    NarrowItDownController.$inject = ['MenuSearchService'];
+    function NarrowItDownController(MenuSearchService) {
+      var ctrl = this;
 
-  service.getMatchedMenuItems = function (searchTerm) {
-    return $http({
-      method: "GET",
-      url: (ApiBasePath + "/menu_items.json")
-    }).then(function (result) {
 
-      var foundItems1 = result.data.menu_items;
-      var foundItems = [];
-        for (var i=0; i < foundItems1.length; i++) {
-          if (foundItems1[i].description.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
-            foundItems.push(foundItems1[i]);
-          }
+      ctrl.searchTerm = '';
+      ctrl.found = [];
+      ctrl.errorMessage = false;
+
+      ctrl.logMenuItems = function () {
+        var promise = MenuSearchService.getMatchedMenuItems(ctrl.searchTerm);
+        promise.then(function (response) {
+          if (response.length !== 0) {
+            ctrl.errorMessage = false;
+          ctrl.found = response;
+        } else {
+          ctrl.errorMessage = true;
         }
-      return foundItems;
+        })
+        .catch(function (error) {
+          console.log("Something went terribly wrong.");
+          ctrl.errorMessage = true;
+        })
+      };
 
-    });
+      ctrl.removeItem = function (itemIndex) {
+        ctrl.found.splice(itemIndex, 1);
+      };
+    };
 
-  };
-}
 
-})();
+    MenuSearchService.$inject = ['$http', 'ApiBasePath', '$filter']
+    function MenuSearchService($http, ApiBasePath) {
+      var service = this;
 
-</script>
+      service.getMatchedMenuItems = function (searchTerm) {
+        return $http({
+          method: "GET",
+          url: (ApiBasePath + "/menu_items.json")
+        }).then(function (result) {
+
+          var foundItems1 = result.data.menu_items;
+          var foundItems = [];
+            for (var i=0; i < foundItems1.length; i++) {
+              if (foundItems1[i].description.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
+                foundItems.push(foundItems1[i]);
+              }
+            }
+          return foundItems;
+
+        });
+
+      };
+    }
+
+    })();
+
+  </script>
 </body>
 </html>
